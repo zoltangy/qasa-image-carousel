@@ -1,6 +1,7 @@
-import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { useSwipeable } from 'react-swipeable';
+import CircularProgress from '@material-ui/core/CircularProgress';
 //--
 import { CarouselImage } from './CarouselImage';
 import { CarouselIndicator } from './CarouselIndicator';
@@ -25,26 +26,40 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
     preventDefaultTouchmoveEvent: true,
     trackMouse: true,
   });
+  const [imagesLoaded, setImagesLoaded] = useState(0);
+  const firstRender = useRef(true);
+
+  useEffect(() => {
+    data.forEach((item) => {
+      const imgageToLoad = new Image();
+      imgageToLoad.src = item.url;
+      imgageToLoad.onload = () => {
+        setImagesLoaded((x) => x + 1);
+      };
+    });
+  }, [data]);
 
   useEffect(() => {
     prevPosRef.current = pos;
-  });
+  }, [pos]);
   const prevPos = prevPosRef.current;
 
-  const captureCurrentWidth = () => {
+  const captureWidthOnResize = () => {
     if (wrapperRef.current) {
       setWidth(wrapperRef.current.offsetWidth);
     }
   };
 
-  useLayoutEffect(() => {
-    captureCurrentWidth();
+  const initialRefForWidth = useCallback((node) => {
+    if (node !== null) {
+      setWidth(node.getBoundingClientRect().width);
+    }
   }, []);
 
   useEffect(() => {
-    window.addEventListener('resize', captureCurrentWidth);
-    return function cleanup() {
-      window.removeEventListener('resize', captureCurrentWidth);
+    window.addEventListener('resize', captureWidthOnResize);
+    return () => {
+      window.removeEventListener('resize', captureWidthOnResize);
     };
   }, []);
 
@@ -53,21 +68,41 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
     if (pos === data.length + 1) setPos(1);
   };
 
-  const goForward = () => setPos((p) => p + 1);
-  const goBackward = () => setPos((p) => p - 1);
-  const goTo = (target: number) => setPos(target);
+  const goForward = () => {
+    firstRender.current = false;
+    setPos((p) => p + 1);
+  };
+  const goBackward = () => {
+    firstRender.current = false;
+    setPos((p) => p - 1);
+  };
+  const goTo = (target: number) => {
+    firstRender.current = false;
+    setPos(target);
+  };
 
   const shouldMoveWithoutTransition =
-    (pos === 1 && prevPos === data.length + 1) || (pos === data.length && prevPos === 0);
+    (pos === 1 && prevPos === data.length + 1) ||
+    (pos === data.length && prevPos === 0) ||
+    firstRender.current;
 
   let indicatorPosition = pos - 1;
   if (pos === 0) indicatorPosition = data.length - 1;
   if (pos === data.length + 1) indicatorPosition = 0;
 
+  if (imagesLoaded !== data.length) {
+    return (
+      <div className={classes.loaderDiv}>
+        <CircularProgress className={classes.loader} />
+      </div>
+    );
+  }
+
   return (
     <div {...handlers}>
-      <div className={classes.wrapper} ref={wrapperRef}>
+      <div className={classes.wrapper} ref={initialRefForWidth}>
         <div
+          ref={wrapperRef}
           className={
             shouldMoveWithoutTransition ? classes.carousel : `${classes.carousel} ${classes.withTransition}`
           }
@@ -87,6 +122,12 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
 };
 
 const useStyles = makeStyles({
+  loaderDiv: {
+    textAlign: 'center',
+  },
+  loader: {
+    color: '#dedede',
+  },
   wrapper: {
     position: 'relative',
     overflow: 'hidden',
