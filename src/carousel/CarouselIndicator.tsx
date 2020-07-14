@@ -15,6 +15,7 @@ export const CarouselIndicator: React.FC<CarouselIndicatorProps> = ({ active, nu
         <div
           className={active === index ? `${classes.indicator} ${classes.indicatorActive}` : classes.indicator}
           onClick={() => goTo(index)}
+          key={index}
         ></div>
       ))}
     </div>

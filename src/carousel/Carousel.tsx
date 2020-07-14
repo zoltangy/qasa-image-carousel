@@ -1,5 +1,6 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
+import { useSwipeable } from 'react-swipeable';
 //--
 import { CarouselImage } from './CarouselImage';
 import { CarouselIndicator } from './CarouselIndicator';
@@ -14,6 +15,12 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
   const [pos, setPos] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null!);
   const [width, setWidth] = useState(0);
+  const handlers = useSwipeable({
+    onSwipedLeft: () => goForward(),
+    onSwipedRight: () => goBackward(),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  });
 
   const captureCurrentWidth = () => {
     if (wrapperRef.current) {
@@ -37,15 +44,17 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
   const goTo = (target: number) => setPos(target);
 
   return (
-    <div className={classes.wrapper} ref={wrapperRef}>
-      <div className={classes.carousel} style={{ left: pos * width * -1 }}>
-        {data.map((item, index) => (
-          <CarouselImage key={item.url} src={item.url} index={index} />
-        ))}
+    <div {...handlers}>
+      <div className={classes.wrapper} ref={wrapperRef}>
+        <div className={classes.carousel} style={{ left: pos * width * -1 }}>
+          {data.map((item, index) => (
+            <CarouselImage key={item.url} src={item.url} index={index} />
+          ))}
+        </div>
+        <CarouselIndicator active={pos} numItems={data.length} goTo={goTo} />
+        <CarouselArrow direction="backward" onClick={() => goBackward()} />
+        <CarouselArrow direction="forward" onClick={() => goForward()} />
       </div>
-      <CarouselIndicator active={pos} numItems={data.length} goTo={goTo} />
-      <CarouselArrow direction="backward" onClick={() => goBackward()} />
-      <CarouselArrow direction="forward" onClick={() => goForward()} />
     </div>
   );
 };
