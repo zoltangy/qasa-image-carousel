@@ -11,9 +11,15 @@ type dataType = { url: string }[];
 
 export type CarouselProps = {
   data: dataType;
+} & typeof defaultProps;
+
+const defaultProps = {
+  showDots: true,
+  showArrows: true,
 };
 
-export const Carousel: React.FC<CarouselProps> = ({ data }) => {
+export const Carousel = (props: CarouselProps) => {
+  const { data, showDots, showArrows } = props;
   const dataWithOffset: dataType = [data[data.length - 1], ...data, data[0]];
   const classes = useStyles();
   const [pos, setPos] = useState(1);
@@ -113,9 +119,13 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
             <CarouselImage key={item.url + index} src={item.url} index={index} />
           ))}
         </div>
-        <CarouselIndicator active={indicatorPosition} numItems={data.length} goTo={goTo} />
-        <CarouselArrow direction="backward" onClick={() => goBackward()} />
-        <CarouselArrow direction="forward" onClick={() => goForward()} />
+        {showDots && <CarouselIndicator active={indicatorPosition} numItems={data.length} goTo={goTo} />}
+        {showArrows && (
+          <>
+            <CarouselArrow direction="backward" onClick={() => goBackward()} />
+            <CarouselArrow direction="forward" onClick={() => goForward()} />
+          </>
+        )}
       </div>
     </div>
   );
@@ -143,3 +153,5 @@ const useStyles = makeStyles({
     transition: 'all 1s ease',
   },
 });
+
+Carousel.defaultProps = defaultProps;
