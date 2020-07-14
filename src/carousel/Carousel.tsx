@@ -34,6 +34,7 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
 
   const goForward = () => setPos((p) => (p === data.length - 1 ? 0 : p + 1));
   const goBackward = () => setPos((p) => (p === 0 ? data.length - 1 : p - 1));
+  const goTo = (target: number) => setPos(target);
 
   return (
     <div className={classes.wrapper} ref={wrapperRef}>
@@ -42,7 +43,7 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
           <CarouselImage key={item.url} src={item.url} index={index} />
         ))}
       </div>
-      <CarouselIndicator active={pos} numItems={data.length} />
+      <CarouselIndicator active={pos} numItems={data.length} goTo={goTo} />
       <CarouselArrow direction="backward" onClick={() => goBackward()} />
       <CarouselArrow direction="forward" onClick={() => goForward()} />
     </div>

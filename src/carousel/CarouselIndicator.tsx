@@ -4,15 +4,17 @@ import { makeStyles } from '@material-ui/styles';
 type CarouselIndicatorProps = {
   active: number;
   numItems: number;
+  goTo: (target: number) => void;
 };
 
-export const CarouselIndicator: React.FC<CarouselIndicatorProps> = ({ active, numItems }) => {
+export const CarouselIndicator: React.FC<CarouselIndicatorProps> = ({ active, numItems, goTo }) => {
   const classes = useStyles();
   return (
     <div className={classes.indicatorWrapper}>
       {Array.from(Array(numItems)).map((item, index) => (
         <div
           className={active === index ? `${classes.indicator} ${classes.indicatorActive}` : classes.indicator}
+          onClick={() => goTo(index)}
         ></div>
       ))}
     </div>
@@ -34,6 +36,7 @@ const useStyles = makeStyles({
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
     borderRadius: '50%',
     transition: 'all 0.7s ease',
+    cursor: 'pointer',
   },
   indicatorActive: {
     backgroundColor: 'white',
