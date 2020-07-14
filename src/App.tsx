@@ -16,14 +16,22 @@ export const App: React.FC = () => {
   const classes = useStyles();
   return (
     <div className={classes.app}>
-      <Carousel data={imageList} />
+      <div className={classes.carouselContainer}>
+        <Carousel data={imageList} />
+      </div>
     </div>
   );
 };
 
 const useStyles = makeStyles({
   app: {
-    width: 1000,
-    height: 600,
+    minHeight: '100vh',
+    minWidth: '100vw',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  carouselContainer: {
+    width: '60%',
   },
 });
