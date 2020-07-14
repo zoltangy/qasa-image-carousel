@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, DefaultTheme } from '@material-ui/styles';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
@@ -11,8 +11,24 @@ export const CarouselArrow: React.FC<React.ComponentProps<'div'> & CarouselArrow
   ...rest
 }) => {
   const classes = useStyles({ direction });
+
+  // Hide button outline by default, add it back if Tab is pressed
+  const [keyboardUser, setKeyboardUser] = useState(false);
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Tab') {
+        setKeyboardUser(true);
+        document.removeEventListener('keydown', handleKeyDown);
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  let className = classes.arrowWrapper;
+  if (!keyboardUser) className += ' ' + classes.noOutline;
   return (
-    <div className={classes.arrowWrapper} {...rest}>
+    <div className={className} {...rest} role="button" aria-label={direction}>
       {direction === 'forward' ? <IoIosArrowForward /> : <IoIosArrowBack />}
     </div>
   );
@@ -36,4 +52,9 @@ const useStyles = makeStyles<DefaultTheme, CarouselArrowProps>({
     },
     transition: 'all 0.4s ease',
   }),
+  noOutline: {
+    '&:focus': {
+      outline: 'none',
+    },
+  },
 });

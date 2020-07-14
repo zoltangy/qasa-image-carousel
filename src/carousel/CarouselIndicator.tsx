@@ -14,7 +14,15 @@ export const CarouselIndicator: React.FC<CarouselIndicatorProps> = ({ active, nu
       {Array.from(Array(numItems)).map((item, index) => {
         let className = classes.indicator;
         if (active === index) className += ' ' + classes.indicatorActive;
-        return <div className={className} onClick={() => goTo(index + 1)} key={index}></div>;
+        return (
+          <div
+            className={className}
+            onClick={() => goTo(index + 1)}
+            key={index}
+            role="button"
+            aria-label={'image-' + index}
+          ></div>
+        );
       })}
     </div>
   );

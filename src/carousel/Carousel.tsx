@@ -16,17 +16,18 @@ export type CarouselProps = {
 const defaultProps = {
   showDots: true,
   showArrows: true,
+  preloadImages: true,
 };
 
 export const Carousel = (props: CarouselProps) => {
-  const { data, showDots, showArrows } = props;
+  const { data, showDots, showArrows, preloadImages } = props;
   const dataWithOffset: dataType = [data[data.length - 1], ...data, data[0]];
   const classes = useStyles();
   const [pos, setPos] = useState(1);
   const prevPosRef = useRef<number | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null!);
   const [width, setWidth] = useState(0);
-  const handlers = useSwipeable({
+  const swipehandlers = useSwipeable({
     onSwipedLeft: () => goForward(),
     onSwipedRight: () => goBackward(),
     preventDefaultTouchmoveEvent: true,
@@ -34,16 +35,59 @@ export const Carousel = (props: CarouselProps) => {
   });
   const [imagesLoaded, setImagesLoaded] = useState(0);
   const firstRender = useRef(true);
+  const [interactionEnabled, setInteractionEnabled] = useState(true);
 
+  const goForward = useCallback(() => {
+    if (!interactionEnabled) return;
+    firstRender.current = false;
+    setPos((p) => p + 1);
+    setInteractionEnabled(false);
+  }, [interactionEnabled]);
+
+  const goBackward = useCallback(() => {
+    if (!interactionEnabled) return;
+    firstRender.current = false;
+    setPos((p) => p - 1);
+    setInteractionEnabled(false);
+  }, [interactionEnabled]);
+
+  const goTo = (target: number) => {
+    if (!interactionEnabled) return;
+    firstRender.current = false;
+    setPos(target);
+    setInteractionEnabled(false);
+  };
+
+  // preload images
   useEffect(() => {
-    data.forEach((item) => {
-      const imgageToLoad = new Image();
-      imgageToLoad.src = item.url;
-      imgageToLoad.onload = () => {
-        setImagesLoaded((x) => x + 1);
-      };
-    });
-  }, [data]);
+    if (preloadImages) {
+      data.forEach((item) => {
+        const imgageToLoad = new Image();
+        imgageToLoad.src = item.url;
+        imgageToLoad.onload = () => {
+          setImagesLoaded((x) => x + 1);
+        };
+      });
+    } else {
+      setImagesLoaded(data.length);
+    }
+  }, [preloadImages, data]);
+
+  // arrow navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        goBackward();
+      } else if (event.key === 'ArrowRight') {
+        goForward();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [goBackward, goForward]);
 
   useEffect(() => {
     prevPosRef.current = pos;
@@ -72,19 +116,7 @@ export const Carousel = (props: CarouselProps) => {
   const handleTransitionEnd = () => {
     if (pos === 0) setPos(data.length);
     if (pos === data.length + 1) setPos(1);
-  };
-
-  const goForward = () => {
-    firstRender.current = false;
-    setPos((p) => p + 1);
-  };
-  const goBackward = () => {
-    firstRender.current = false;
-    setPos((p) => p - 1);
-  };
-  const goTo = (target: number) => {
-    firstRender.current = false;
-    setPos(target);
+    setInteractionEnabled(true);
   };
 
   const shouldMoveWithoutTransition =
@@ -105,9 +137,10 @@ export const Carousel = (props: CarouselProps) => {
   }
 
   return (
-    <div {...handlers}>
+    <div {...swipehandlers}>
       <div className={classes.wrapper} ref={initialRefForWidth}>
         <div
+          data-testid="wrapper"
           ref={wrapperRef}
           className={
             shouldMoveWithoutTransition ? classes.carousel : `${classes.carousel} ${classes.withTransition}`
@@ -122,8 +155,22 @@ export const Carousel = (props: CarouselProps) => {
         {showDots && <CarouselIndicator active={indicatorPosition} numItems={data.length} goTo={goTo} />}
         {showArrows && (
           <>
-            <CarouselArrow direction="backward" onClick={() => goBackward()} />
-            <CarouselArrow direction="forward" onClick={() => goForward()} />
+            <CarouselArrow
+              direction="backward"
+              onClick={() => goBackward()}
+              onKeyDown={(event) => {
+                if (event.key === ' ' || event.key === 'Enter' || event.key === 'Spacebar') goBackward();
+              }}
+              tabIndex={0}
+            />
+            <CarouselArrow
+              direction="forward"
+              onClick={() => goForward()}
+              onKeyDown={(event) => {
+                if (event.key === ' ' || event.key === 'Enter' || event.key === 'Spacebar') goForward();
+              }}
+              tabIndex={0}
+            />
           </>
         )}
       </div>
