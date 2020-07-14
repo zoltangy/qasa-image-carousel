@@ -2,9 +2,7 @@ import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 //--
 import { CarouselImage } from './CarouselImage';
-
-// TODO: dummy width for now, get it dynamically
-//const width = 1000;
+import { CarouselIndicator } from './CarouselIndicator';
 
 export type CarouselProps = {
   data: { url: string }[];
@@ -14,12 +12,11 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
   const classes = useStyles();
   const [pos, setPos] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null!);
-  const [width, setDimensions] = useState(0);
+  const [width, setWidth] = useState(0);
 
   const captureCurrentWidth = () => {
     if (wrapperRef.current) {
-      console.log(wrapperRef.current.offsetWidth);
-      setDimensions(wrapperRef.current.offsetWidth);
+      setWidth(wrapperRef.current.offsetWidth);
     }
   };
 
@@ -44,6 +41,7 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
           <CarouselImage key={item.url} src={item.url} index={index} />
         ))}
       </div>
+      <CarouselIndicator active={pos} numItems={data.length} />
       <button onClick={() => goBackward()}>backwards</button>
       <button onClick={() => goForward()}>forward</button>
     </div>

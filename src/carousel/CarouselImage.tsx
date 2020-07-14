@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 
-export type CarouselImageProps = {
+type CarouselImageProps = {
   src: string;
   index: number;
 };
