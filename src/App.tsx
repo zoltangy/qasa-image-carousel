@@ -13,15 +13,16 @@ const imageList: { url: string }[] = [
 ];
 
 export const App: React.FC = () => {
+  const classes = useStyles();
   return (
-    <div>
+    <div className={classes.app}>
       <Carousel data={imageList} />
     </div>
   );
 };
 
 const useStyles = makeStyles({
-  carousel: {
+  app: {
     width: 1000,
     height: 600,
   },
