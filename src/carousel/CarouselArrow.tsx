@@ -29,7 +29,7 @@ const useStyles = makeStyles<DefaultTheme, CarouselArrowProps>({
     justifyContent: 'center',
     alignItems: 'center',
     color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 50,
+    fontSize: '4.5vw',
     '&:hover': {
       color: 'rgba(140, 140, 140, 0.9)',
       backgroundColor: 'rgba(255, 255, 255, 0.5)',

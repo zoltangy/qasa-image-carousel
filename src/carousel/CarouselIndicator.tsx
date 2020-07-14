@@ -11,13 +11,11 @@ export const CarouselIndicator: React.FC<CarouselIndicatorProps> = ({ active, nu
   const classes = useStyles();
   return (
     <div className={classes.indicatorWrapper}>
-      {Array.from(Array(numItems)).map((item, index) => (
-        <div
-          className={active === index ? `${classes.indicator} ${classes.indicatorActive}` : classes.indicator}
-          onClick={() => goTo(index)}
-          key={index}
-        ></div>
-      ))}
+      {Array.from(Array(numItems)).map((item, index) => {
+        let className = classes.indicator;
+        if (active === index) className += ' ' + classes.indicatorActive;
+        return <div className={className} onClick={() => goTo(index + 1)} key={index}></div>;
+      })}
     </div>
   );
 };
