@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/styles';
 //--
 import { CarouselImage } from './CarouselImage';
 import { CarouselIndicator } from './CarouselIndicator';
+import { CarouselArrow } from './CarouselArrow';
 
 export type CarouselProps = {
   data: { url: string }[];
@@ -42,14 +43,15 @@ export const Carousel: React.FC<CarouselProps> = ({ data }) => {
         ))}
       </div>
       <CarouselIndicator active={pos} numItems={data.length} />
-      <button onClick={() => goBackward()}>backwards</button>
-      <button onClick={() => goForward()}>forward</button>
+      <CarouselArrow direction="backward" onClick={() => goBackward()} />
+      <CarouselArrow direction="forward" onClick={() => goForward()} />
     </div>
   );
 };
 
 const useStyles = makeStyles({
   wrapper: {
+    position: 'relative',
     overflow: 'hidden',
   },
   carousel: {
