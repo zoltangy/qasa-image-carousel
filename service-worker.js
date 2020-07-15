@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/qasa-image-carousel/precache-manifest.5db0f933afbc825f58da453be6436929.js"
+  "/qasa-image-carousel/precache-manifest.49cb6e0f2e61e4302d81b3c9a5757a9c.js"
 );
 
 self.addEventListener('message', (event) => {
