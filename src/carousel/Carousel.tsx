@@ -37,6 +37,13 @@ export const Carousel = (props: CarouselProps) => {
   const firstRender = useRef(true);
   const [interactionEnabled, setInteractionEnabled] = useState(true);
 
+  // get previous position, to know where the last transition came from
+  useEffect(() => {
+    prevPosRef.current = pos;
+  }, [pos]);
+  const prevPos = prevPosRef.current;
+
+  // move control functions
   const goForward = useCallback(() => {
     if (!interactionEnabled) return;
     firstRender.current = false;
@@ -89,45 +96,42 @@ export const Carousel = (props: CarouselProps) => {
     };
   }, [goBackward, goForward]);
 
-  useEffect(() => {
-    prevPosRef.current = pos;
-  }, [pos]);
-  const prevPos = prevPosRef.current;
-
-  const captureWidthOnResize = () => {
-    if (wrapperRef.current) {
-      setWidth(wrapperRef.current.offsetWidth);
+  // get initial width and update on resize
+  const getWidth = (el: HTMLDivElement) => {
+    if (el !== null) {
+      setWidth(el.getBoundingClientRect().width);
     }
   };
 
-  const initialRefForWidth = useCallback((node) => {
-    if (node !== null) {
-      setWidth(node.getBoundingClientRect().width);
-    }
-  }, []);
+  const captureWidthOnResize = useCallback(() => getWidth(wrapperRef.current), []);
+  const initialRefForWidth = useCallback((el) => getWidth(el), []);
 
   useEffect(() => {
     window.addEventListener('resize', captureWidthOnResize);
     return () => {
       window.removeEventListener('resize', captureWidthOnResize);
     };
-  }, []);
+  }, [captureWidthOnResize]);
 
+  // handle 'instant jump' when wrapping around after transition finished, also re-enable controls
   const handleTransitionEnd = () => {
     if (pos === 0) setPos(data.length);
     if (pos === data.length + 1) setPos(1);
     setInteractionEnabled(true);
   };
 
+  // when wrapping around and on the first load, slide instantly (without transition)
   const shouldMoveWithoutTransition =
     (pos === 1 && prevPos === data.length + 1) ||
     (pos === data.length && prevPos === 0) ||
     firstRender.current;
 
+  // active dot position needs to account for wrapping around
   let indicatorPosition = pos - 1;
   if (pos === 0) indicatorPosition = data.length - 1;
   if (pos === data.length + 1) indicatorPosition = 0;
 
+  // loading spinner
   if (imagesLoaded !== data.length) {
     return (
       <div className={classes.loaderDiv}>
@@ -140,7 +144,7 @@ export const Carousel = (props: CarouselProps) => {
     <div {...swipehandlers}>
       <div className={classes.wrapper} ref={initialRefForWidth}>
         <div
-          data-testid="wrapper"
+          data-testid="carousel"
           ref={wrapperRef}
           className={
             shouldMoveWithoutTransition ? classes.carousel : `${classes.carousel} ${classes.withTransition}`

@@ -37,7 +37,7 @@ window.HTMLElement.prototype.getBoundingClientRect = function () {
 describe('Carousel tests', () => {
   // verify that images slide to the right place and correct 'dot' is highlighted
   const validateState = (activeImage: number) => {
-    expect(screen.getByTestId('wrapper')).toHaveStyle(`left: ${width * -1 * activeImage}px`);
+    expect(screen.getByTestId('carousel')).toHaveStyle(`left: ${width * -1 * activeImage}px`);
     for (let i = 0; i < 3; i++) {
       if (i === activeImage - 1) {
         expect(screen.getByRole('button', { name: 'image-' + i })).toHaveStyle('background-color: white');
@@ -50,12 +50,12 @@ describe('Carousel tests', () => {
   // click button, fire transitionEnd event manually
   const goForward = () => {
     userEvent.click(screen.getByRole('button', { name: 'forward' }));
-    fireEvent.transitionEnd(screen.getByTestId('wrapper'));
+    fireEvent.transitionEnd(screen.getByTestId('carousel'));
   };
 
   const goBackward = () => {
     userEvent.click(screen.getByRole('button', { name: 'backward' }));
-    fireEvent.transitionEnd(screen.getByTestId('wrapper'));
+    fireEvent.transitionEnd(screen.getByTestId('carousel'));
   };
 
   it('goes forward and wraps correctly', async () => {
@@ -123,15 +123,15 @@ describe('Carousel tests', () => {
     validateState(1);
 
     userEvent.click(getByRole('button', { name: 'image-2' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
+    fireEvent.transitionEnd(getByTestId('carousel'));
     validateState(3);
 
     userEvent.click(getByRole('button', { name: 'image-0' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
+    fireEvent.transitionEnd(getByTestId('carousel'));
     validateState(1);
 
     userEvent.click(getByRole('button', { name: 'image-1' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
+    fireEvent.transitionEnd(getByTestId('carousel'));
     validateState(2);
   });
 
@@ -145,11 +145,11 @@ describe('Carousel tests', () => {
     validateState(1);
 
     fireEvent.keyDown(document, { key: 'ArrowLeft', code: 'ArrowLeft' });
-    fireEvent.transitionEnd(getByTestId('wrapper'));
+    fireEvent.transitionEnd(getByTestId('carousel'));
     validateState(3);
 
     fireEvent.keyDown(document, { key: 'ArrowRight', code: 'ArrowRight' });
-    fireEvent.transitionEnd(getByTestId('wrapper'));
+    fireEvent.transitionEnd(getByTestId('carousel'));
     validateState(1);
   });
 });
