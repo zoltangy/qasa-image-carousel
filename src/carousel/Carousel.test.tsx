@@ -38,7 +38,7 @@ describe('Carousel tests', () => {
   // verify that images slide to the right place and correct 'dot' is highlighted
   const validateState = (activeImage: number) => {
     expect(screen.getByTestId('carousel')).toHaveStyle(`left: ${width * -1 * activeImage}px`);
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < data.length; i++) {
       if (i === activeImage - 1) {
         expect(screen.getByRole('button', { name: 'image-' + i })).toHaveStyle('background-color: white');
       } else {

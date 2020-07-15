@@ -1,13 +1,15 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
+//--
+import { Action, JUMP } from './Carousel';
 
 type CarouselIndicatorProps = {
   active: number;
   numItems: number;
-  goTo: (target: number) => void;
+  dispatch: React.Dispatch<Action>;
 };
 
-export const CarouselIndicator: React.FC<CarouselIndicatorProps> = ({ active, numItems, goTo }) => {
+export const CarouselIndicator: React.FC<CarouselIndicatorProps> = ({ active, numItems, dispatch }) => {
   const classes = useStyles();
   return (
     <div className={classes.indicatorWrapper}>
@@ -17,7 +19,7 @@ export const CarouselIndicator: React.FC<CarouselIndicatorProps> = ({ active, nu
         return (
           <div
             className={className}
-            onClick={() => goTo(index + 1)}
+            onClick={() => dispatch({ type: JUMP, payload: index + 1 })}
             key={index}
             role="button"
             aria-label={'image-' + index}
