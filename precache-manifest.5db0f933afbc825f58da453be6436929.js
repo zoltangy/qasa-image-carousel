@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "07da34dc11946cc00a9032f4f1beac48",
+    "revision": "182b075379b3b5a0a6d7fff30b5ff696",
     "url": "/qasa-image-carousel/index.html"
   },
   {
@@ -12,8 +12,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/qasa-image-carousel/static/js/2.99d07c37.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "fa23bd8c096375f4f1dd",
-    "url": "/qasa-image-carousel/static/js/main.6cabb0c9.chunk.js"
+    "revision": "20d5f74560f4db99bdf8",
+    "url": "/qasa-image-carousel/static/js/main.640485be.chunk.js"
   },
   {
     "revision": "bd532497855796396af5",
