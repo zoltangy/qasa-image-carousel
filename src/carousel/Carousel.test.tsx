@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Carousel } from './Carousel';
 import img1 from '../../assets/1.jpg';
@@ -35,8 +35,31 @@ window.HTMLElement.prototype.getBoundingClientRect = function () {
 };
 
 describe('Carousel tests', () => {
+  // verify that images slide to the right place and correct 'dot' is highlighted
+  const validateState = (activeImage: number) => {
+    expect(screen.getByTestId('wrapper')).toHaveStyle(`left: ${width * -1 * activeImage}px`);
+    for (let i = 0; i < 3; i++) {
+      if (i === activeImage - 1) {
+        expect(screen.getByRole('button', { name: 'image-' + i })).toHaveStyle('background-color: white');
+      } else {
+        expect(screen.getByRole('button', { name: 'image-' + i })).not.toHaveStyle('background-color: white');
+      }
+    }
+  };
+
+  // click button, fire transitionEnd event manually
+  const goForward = () => {
+    userEvent.click(screen.getByRole('button', { name: 'forward' }));
+    fireEvent.transitionEnd(screen.getByTestId('wrapper'));
+  };
+
+  const goBackward = () => {
+    userEvent.click(screen.getByRole('button', { name: 'backward' }));
+    fireEvent.transitionEnd(screen.getByTestId('wrapper'));
+  };
+
   it('goes forward and wraps correctly', async () => {
-    const { getByTestId, getByAltText, getByRole } = render(
+    const { getByAltText, getByRole } = render(
       <div>
         <Carousel data={data} preloadImages={false} />
       </div>
@@ -47,95 +70,47 @@ describe('Carousel tests', () => {
     expect(getByAltText(/Image #3/i)).toBeVisible();
     expect(getByRole('button', { name: 'forward' })).toBeInTheDocument();
     expect(getByRole('button', { name: 'backward' })).toBeInTheDocument();
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -1}px`);
-    expect(getByRole('button', { name: 'image-0' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    validateState(1);
 
-    // click button, fire transitionEnd event manually, verify that images slide and correct 'dot' is highlighted
-    userEvent.click(getByRole('button', { name: 'forward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -2}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    goForward();
+    validateState(2);
 
-    userEvent.click(getByRole('button', { name: 'forward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -3}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).toHaveStyle('background-color: white');
+    goForward();
+    validateState(3);
 
-    userEvent.click(getByRole('button', { name: 'forward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -1}px`);
-    expect(getByRole('button', { name: 'image-0' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    goForward();
+    validateState(1);
 
-    userEvent.click(getByRole('button', { name: 'forward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -2}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    goForward();
+    validateState(2);
 
-    userEvent.click(getByRole('button', { name: 'forward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -3}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).toHaveStyle('background-color: white');
+    goForward();
+    validateState(3);
   });
 
   it('goes backward and wraps correctly', async () => {
-    const { getByTestId, getByRole } = render(
+    render(
       <div>
         <Carousel data={data} preloadImages={false} />
       </div>
     );
 
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -1}px`);
-    expect(getByRole('button', { name: 'image-0' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    validateState(1);
 
-    // click button, fire transitionEnd event manually, verify that images slide and correct 'dot' is highlighted
-    userEvent.click(getByRole('button', { name: 'backward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -3}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).toHaveStyle('background-color: white');
+    goBackward();
+    validateState(3);
 
-    userEvent.click(getByRole('button', { name: 'backward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -2}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    goBackward();
+    validateState(2);
 
-    userEvent.click(getByRole('button', { name: 'backward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -1}px`);
-    expect(getByRole('button', { name: 'image-0' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    goBackward();
+    validateState(1);
 
-    userEvent.click(getByRole('button', { name: 'backward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -3}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).toHaveStyle('background-color: white');
+    goBackward();
+    validateState(3);
 
-    userEvent.click(getByRole('button', { name: 'backward' }));
-    fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -2}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    goBackward();
+    validateState(2);
   });
 
   it('jumps to the correct image when clicked', async () => {
@@ -145,58 +120,36 @@ describe('Carousel tests', () => {
       </div>
     );
 
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -1}px`);
-    expect(getByRole('button', { name: 'image-0' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    validateState(1);
 
-    // click button, fire transitionEnd event manually, verify that images slide and correct 'dot' is highlighted
     userEvent.click(getByRole('button', { name: 'image-2' }));
     fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -3}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).toHaveStyle('background-color: white');
+    validateState(3);
 
     userEvent.click(getByRole('button', { name: 'image-0' }));
     fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -1}px`);
-    expect(getByRole('button', { name: 'image-0' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    validateState(1);
 
     userEvent.click(getByRole('button', { name: 'image-1' }));
     fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -2}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    validateState(2);
   });
 
   it('is possible to navigate with the arrow keys', async () => {
-    const { getByTestId, getByRole } = render(
+    const { getByTestId } = render(
       <div>
         <Carousel data={data} preloadImages={false} />
       </div>
     );
 
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -1}px`);
-    expect(getByRole('button', { name: 'image-0' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    validateState(1);
 
     fireEvent.keyDown(document, { key: 'ArrowLeft', code: 'ArrowLeft' });
     fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -3}px`);
-    expect(getByRole('button', { name: 'image-0' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).toHaveStyle('background-color: white');
+    validateState(3);
 
     fireEvent.keyDown(document, { key: 'ArrowRight', code: 'ArrowRight' });
     fireEvent.transitionEnd(getByTestId('wrapper'));
-    expect(getByTestId('wrapper')).toHaveStyle(`left: ${width * -1}px`);
-    expect(getByRole('button', { name: 'image-0' })).toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-1' })).not.toHaveStyle('background-color: white');
-    expect(getByRole('button', { name: 'image-2' })).not.toHaveStyle('background-color: white');
+    validateState(1);
   });
 });
