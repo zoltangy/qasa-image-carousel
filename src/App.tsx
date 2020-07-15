@@ -15,23 +15,18 @@ const imageList = [
 export const App: React.FC = () => {
   const classes = useStyles();
   return (
-    <div className={classes.app}>
-      <div className={classes.carouselContainer}>
-        <Carousel data={imageList} />
-      </div>
+    <div className={classes.carouselContainer}>
+      <Carousel data={imageList} />
     </div>
   );
 };
 
 const useStyles = makeStyles({
-  app: {
-    minHeight: '100vh',
-    minWidth: '100vw',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   carouselContainer: {
-    width: '60%',
+    width: '70%',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
   },
 });

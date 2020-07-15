@@ -8,12 +8,20 @@ type CarouselImageProps = {
 
 export const CarouselImage: React.FC<CarouselImageProps> = ({ src, index }) => {
   const classes = useStyles();
-  return <img src={src} alt={'Image #' + index} className={classes.image} />;
+  return (
+    <div className={classes.imageWrapper}>
+      <img src={src} alt={'Image #' + index} className={classes.image} />
+    </div>
+  );
 };
 
 const useStyles = makeStyles({
+  imageWrapper: {
+    flex: '1 0 100%',
+  },
   image: {
     width: '100%',
     height: '100%',
+    objectFit: 'contain',
   },
 });
