@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles, DefaultTheme } from '@material-ui/styles';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
+//--
+import { Action, FORWARD, BACKWARD } from './Carousel';
+
+type direction = 'forward' | 'backward';
 
 type CarouselArrowProps = {
-  direction: 'forward' | 'backward';
+  direction: direction;
+  dispatch: React.Dispatch<Action>;
 };
 
 export const CarouselArrow: React.FC<React.ComponentProps<'div'> & CarouselArrowProps> = ({
   direction,
+  dispatch,
   ...rest
 }) => {
   const classes = useStyles({ direction });
@@ -28,13 +34,26 @@ export const CarouselArrow: React.FC<React.ComponentProps<'div'> & CarouselArrow
   let className = classes.arrowWrapper;
   if (!keyboardUser) className += ' ' + classes.noOutline;
   return (
-    <div className={className} {...rest} role="button" aria-label={direction}>
+    <div
+      className={className}
+      {...rest}
+      role="button"
+      aria-label={direction}
+      tabIndex={0}
+      onClick={() => dispatch(direction === 'forward' ? { type: FORWARD } : { type: BACKWARD })}
+      onKeyDown={(event) => {
+        if (event.key === ' ' || event.key === 'Enter' || event.key === 'Spacebar') {
+          event.preventDefault();
+          dispatch(direction === 'forward' ? { type: FORWARD } : { type: BACKWARD });
+        }
+      }}
+    >
       {direction === 'forward' ? <IoIosArrowForward /> : <IoIosArrowBack />}
     </div>
   );
 };
 
-const useStyles = makeStyles<DefaultTheme, CarouselArrowProps>({
+const useStyles = makeStyles<DefaultTheme, { direction: direction }>({
   arrowWrapper: (props) => ({
     height: '100%',
     left: props.direction === 'backward' ? 0 : '',

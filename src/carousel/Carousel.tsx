@@ -174,28 +174,8 @@ export const Carousel = (props: CarouselProps) => {
       )}
       {showArrows && (
         <>
-          <CarouselArrow
-            direction="backward"
-            onClick={() => dispatch({ type: BACKWARD })}
-            onKeyDown={(event) => {
-              if (event.key === ' ' || event.key === 'Enter' || event.key === 'Spacebar') {
-                event.preventDefault();
-                dispatch({ type: BACKWARD });
-              }
-            }}
-            tabIndex={0}
-          />
-          <CarouselArrow
-            direction="forward"
-            onClick={() => dispatch({ type: FORWARD })}
-            onKeyDown={(event) => {
-              if (event.key === ' ' || event.key === 'Enter' || event.key === 'Spacebar') {
-                event.preventDefault();
-                dispatch({ type: FORWARD });
-              }
-            }}
-            tabIndex={0}
-          />
+          <CarouselArrow direction="backward" dispatch={dispatch} />
+          <CarouselArrow direction="forward" dispatch={dispatch} />
         </>
       )}
     </div>
@@ -204,7 +184,10 @@ export const Carousel = (props: CarouselProps) => {
 
 const useStyles = makeStyles({
   loaderDiv: {
-    textAlign: 'center',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
   },
   loader: {
     color: '#dedede',
@@ -212,6 +195,8 @@ const useStyles = makeStyles({
   wrapper: {
     position: 'relative',
     overflow: 'hidden',
+    width: '100%',
+    height: '100%',
   },
   carousel: {
     position: 'relative',
